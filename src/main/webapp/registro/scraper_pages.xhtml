@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../tmplt/dentro.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="contenido">
+        <h:form id="reg_scr_pag" >
+            <p:panel id="reg_pan_scrap">
+                <p:fieldset legend="Registro de paginas (Tiendas Magicas)" >
+                    <p:panel id="grid_scraped_pages">
+                        <p:panelGrid columns="3" layout="grid" columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-4" styleClass="ui-panelgrid-blank" >
+                            <h:panelGroup>
+                                <div><p:outputLabel value="Nombre" for="nom"/></div>
+                                <p:inputText id="nom" required="true" value="#{reg_scraper_pages_Bean.nomTienda}" placeholder="eg. Tucupita Magic Shop"  />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <div><p:outputLabel value="Dominio" for="dom"/></div>
+                                <p:inputText id="dom" required="true" value="#{reg_scraper_pages_Bean.dominio}" placeholder="eg. www.tiendamagica.com" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <div><p:outputLabel value="Metodo de Busqueda" for="mt_q"/></div>
+                                <p:inputText id="mt_q"  value="#{reg_scraper_pages_Bean.mtdQ}" placeholder="eg. search.php?q=" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <div><p:outputLabel value="Clase CSS de Contenedor "  for="t_div"/></div>
+                                <p:inputText id="t_div" required="true"  value="#{reg_scraper_pages_Bean.tagDiv}" placeholder="eg. search_result" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <div><p:outputLabel value="Etiqueta de Thumb"  for="t_thum"/></div>
+                                <p:inputText id="t_thum" required="true"  value="#{reg_scraper_pages_Bean.tagThumb}" placeholder="eg. img" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <div><p:outputLabel value="Etiqueta de Titulo"  for="t_title"/></div>
+                                <p:inputText id="t_title" required="true"  value="#{reg_scraper_pages_Bean.tagTitle}"  placeholder="eg. .search_tittle ó a > h3" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <div><p:outputLabel value="Clase CSS de Precio"  for="t_price"/></div>
+                                <p:inputText id="t_price" required="true"  value="#{reg_scraper_pages_Bean.tagPrice}"  placeholder="eg. search_price" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <div><p:outputLabel value="Argumento adicional"  for="arg_adi"/></div>
+                                <p:inputText id="arg_adi" value="#{reg_scraper_pages_Bean.argAdi}" placeholder="eg. &amp;limit=all" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <div><p:outputLabel value="Validaciones"  /></div>
+                                <div style="padding-top: 0.7em;">
+                                    <h:outputText value=" Https: "  />
+                                    <p:selectBooleanCheckbox id="is_hhtps" value="#{reg_scraper_pages_Bean.https}"/>
+                                    <h:outputText value=" JSON_Request: "  />
+                                    <p:selectBooleanCheckbox id="is_id" value="#{reg_scraper_pages_Bean.is_id}" />
+                                    <h:outputText value=" Method Post: "  />
+                                    <p:selectBooleanCheckbox id="is_post" value="#{reg_scraper_pages_Bean.is_post}" />
+                                </div>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:panel> 
+                </p:fieldset>
+                <p:separator/>
+                <br/>           
+                <p:commandButton id="btn_probar_scraping" value="PROBAR" icon="fa fa-desktop" onstart="PrimeFaces.widgets.widget_reg_scr_pag_action_search.disable();PF('bui-scr').show();PrimeFaces.widgets.widget_reg_scr_pag_btn_probar_scraping.disable()" oncomplete="PF('bui-scr').hide();PrimeFaces.widgets.widget_reg_scr_pag_action_search.enable()" action="#{reg_scraper_pages_Bean.pruebaScraper()}" validateClient="true" update="reg_pan_scrap"/>
+                <p:ajaxStatus style="display:block;margin-bottom:2em;height:24px;padding: 0;">
+                    <f:facet name="start">
+                        <p:graphicImage value="http://www.primefaces.org/showcase/javax.faces.resource/demo/images/ajaxloadingbar.gif.xhtml" />
+                    </f:facet>
+                </p:ajaxStatus>
+            </p:panel>
+            <p:dialog widgetVar="confir" header="Confirmar Registro" width="80%" responsive="true"  modal="true" >
+                <p:outputLabel value="Esta es una prueba, si se ven los datos, todo esta bien!, en caso que falle algún campo, intenta una nueva busqueda ó revisa las etiquetas!" />
+                <p:panel style="border: 0" id="test_scraping_pan">
+                    <p:fieldset style="text-align: center">
+                        <p:inputText id="item_search" style="width: 80%; height: 3em;" title="Comienza La Busqueda" value="#{reg_scraper_pages_Bean.item_search}" />
+                        <p:watermark value="e.g 52 Shades of Red (Gimmicks included) Version 2 by Shin Lim" for="item_search" />
+                        <p:commandButton id="action-search" style="height: 3.1em" icon="fa fa-search" action="#{reg_scraper_pages_Bean.pruebaScraper()}" 
+                                         update="data-grid-search" onstart="PF('bui-scr').show()" onclick="PrimeFaces.widgets.widget_reg_scr_pag_action_search.disable()" oncomplete="PF('bui-scr').hide();"  onsuccess="PrimeFaces.widgets.widget_reg_scr_pag_action_search.enable()"/>
+                    </p:fieldset>
+                    <p:panel id="data-grid-search"  style="border: 0">
+                        <c:if test="#{reg_scraper_pages_Bean.pruebaResultados!=null}">
+                            <p:dataScroller var="result" value="#{reg_scraper_pages_Bean.pruebaResultados}"  chunkSize="25"   >
+                                <p:column>
+                                    <p:panelGrid columns="3" layout="grid">
+                                        <h:panelGroup>
+                                            <p:graphicImage value="#{result.imagen_link}" width="120" height="120" />
+                                            <div><h:outputText value="Imagen previa" style="color: #ad1410"/></div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="text-align: left;">
+                                            <h:panelGroup>
+                                                <div><h:outputText style="padding-top: 0.5em;padding-bottom:  0.5em;font-size: 1.5em; font-weight: bold" value="#{result.nomTienda}"/></div> 
+                                                <div><h:outputText value="Nombre tienda" style="color: #ad1410"/></div>
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <div style="padding-top: 1.5em;padding-bottom:  1em;"><h:outputText value="#{result.titulo}"/></div> 
+                                                <div><h:outputText value="Nombre producto" style="color: #ad1410" /></div>
+                                            </h:panelGroup>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <h:outputText value="#{result.precio_txt}" style="font-size: 2em;font-weight: bold;" />
+                                            <div><h:outputText value="Precio producto" style="color: #ad1410"/></div>
+                                        </h:panelGroup>
+                                    </p:panelGrid>
+                                </p:column>
+                            </p:dataScroller>
+                        </c:if>
+                        <c:if test="#{reg_scraper_pages_Bean.pruebaResultados.size()==0 }" >
+                            <p:outputPanel>
+                                <p:outputLabel value="ADVERTENCIA!!...No se puedo encontrar nada, por favor revisa los datos ó intenta una nueva busqueda!" />
+                            </p:outputPanel>
+                        </c:if>
+                    </p:panel>
+                    <p:blockUI block="data-grid-search" widgetVar="bui-scr" >
+                        Buscando! <br/>
+                        <p:graphicImage value="http://www.primefaces.org/showcase/javax.faces.resource/demo/images/ajaxloadingbar.gif.xhtml"/>
+                    </p:blockUI>
+                    <p:separator/>
+                    <br/>           
+                    <p:commandButton id="btnFin" value="Si, Seguro!" action="#{reg_scraper_pages_Bean.processScraper(event)}" oncomplete="PF('confir').hide();" update="grid_scraped_pages" />
+                    <p:commandButton value="No, Aun!" onclick="PF('confir').hide()" type="button" oncomplete="" />
+                </p:panel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

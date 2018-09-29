@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html  lang="es"
+       xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+       xmlns:h="http://xmlns.jcp.org/jsf/html"
+       xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet library="css" name="normalize.css" />
+        <h:outputStylesheet library="css" name="cssLayout.css" />
+        <script language="Javascript" src="#{request.contextPath}/resources/js/move.js" />
+        <script language="Javascript" src="#{request.contextPath}/resources/js/svg_snap.js" />
+        <link href="#{request.contextPath}/resources/css/popup-menu.css" rel="stylesheet" type="text/css" />
+        <title>Scraper Magic</title>
+    </h:head>
+    <h:body>
+        <nav id="menu" class="menu">
+            <button class="menu__handle"><span>Menu</span></button>
+            <div class="menu__inner">
+                <ul style="font-size: 85%">
+                    <li><p:outputLabel value="Usuario"/></li>
+                    <li><p:inputText /></li>
+                    <li><p:outputLabel value="Contraseña" /></li>
+                    <li><p:inputText /></li>
+                    <li style="padding-top: 0.5em;" >
+                        <h:panelGroup >
+                            <p:button value="login" />
+                            <p:button value="te olvidaste?" />
+                        </h:panelGroup>
+                    </li>
+                    <li><a href="#{request.contextPath.concat('/')}" >Inicio</a></li>
+                    <li><a href="#{request.contextPath.concat('/Registrar/Pagina')}" >Registro</a></li>
+                    <li><a href="#{request.contextPath.concat('/Vistas/Paginas')}" >Paginas</a></li>
+                </ul>
+            </div>
+            <div class="morph-shape" data-morph-open="M-10,100c0,0,44-95,290-95c232,0,290,95,290,95" data-morph-close="M-10,100c0,0,44,95,290,95c232,0,290-95,290-95">
+                <svg width="100%" height="100%" viewBox="0 0 560 200" preserveAspectRatio="none">
+                    <path fill="none" d="M-10,100c0,0,44,0,290,0c232,0,290,0,290,0"/>
+                </svg>
+            </div>
+        </nav>
+        <div class="main">
+            <div class="contenedores">
+                <section id="Contenedor " class="ui-widget-content" style="border: 0;"  >
+                    <section  id="principal" style="border: 0;" >
+                        <article>
+                            <ui:insert name="contenido">
+
+                            </ui:insert>
+                        </article>
+                    </section>
+                </section>
+                <footer style="border: 0;" >
+
+                </footer>
+            </div>
+        </div>
+        <p:ajaxExceptionHandler type="javax.faces.application.ViewExpiredException" onexception="document.location.href = document.location.href;" />
+    </h:body>
+    <script src="#{request.contextPath}/resources/js/classie.js" />
+    <script>
+        (function () {
+
+            function SVGMenu(el, options) {
+                this.el = el;
+                this.init();
+            }
+
+            SVGMenu.prototype.init = function () {
+                this.trigger = this.el.querySelector('button.menu__handle');
+                this.shapeEl = this.el.querySelector('div.morph-shape');
+
+                var s = Snap(this.shapeEl.querySelector('svg'));
+                this.pathEl = s.select('path');
+                this.paths = {
+                    reset: this.pathEl.attr('d'),
+                    open: this.shapeEl.getAttribute('data-morph-open'),
+                    close: this.shapeEl.getAttribute('data-morph-close')
+                };
+
+                this.isOpen = false;
+
+                this.initEvents();
+            };
+
+            SVGMenu.prototype.initEvents = function () {
+                this.trigger.addEventListener('click', this.toggle.bind(this));
+            };
+
+            SVGMenu.prototype.toggle = function () {
+                var self = this;
+
+                if (this.isOpen) {
+                    classie.remove(self.el, 'menu--anim');
+                    setTimeout(function () {
+                        classie.remove(self.el, 'menu--open');
+                    }, 250);
+
+                    this.pathEl.stop().animate({'path': this.paths.close}, 350, mina.easeout, function () {
+                        self.pathEl.stop().animate({'path': self.paths.reset}, 700, mina.elastic);
+                    });
+                } else {
+                    classie.add(self.el, 'menu--anim');
+                    setTimeout(function () {
+                        classie.add(self.el, 'menu--open');
+                    }, 250);
+
+                    this.pathEl.stop().animate({'path': this.paths.open}, 350, mina.backin, function () {
+                        self.pathEl.stop().animate({'path': self.paths.reset}, 700, mina.elastic);
+                    });
+                }
+                this.isOpen = !this.isOpen;
+            };
+
+            new SVGMenu(document.getElementById('menu'));
+
+        })();
+    </script>
+</html>

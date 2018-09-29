@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <body>
+        <ui:composition template="./../tmplt/dentro.xhtml">
+            <ui:define name="contenido">
+                <h:form id="form_paginas">
+                    <p:contextMenu for="pag_reg_scraping">
+                        <p:menuitem value="Modificar" icon="ui-icon-pencil" process="pag_reg_scraping"  update="form_paginas" oncomplete="PF('modificarPage').show();" />
+                        <p:menuitem value="Eliminar" icon="ui-icon-trash" process="pag_reg_scraping"  onclick="PF('removeMe').show();"/>
+                    </p:contextMenu>
+                    <p:dataTable id="pag_reg_scraping" var="pagina" paginator="true" value="#{paginaRegistradasBean.paginas}" 
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" 
+                                 rows="30" rowsPerPageTemplate="30,60,90" emptyMessage="No se Encuentraron Datos" filteredValue="#{paginaRegistradasBean.paginasFiltradas}" paginatorPosition="bottom"
+                                 selection="#{paginaRegistradasBean.selecPagina}" selectionMode="single" rowKey="#{pagina.idscraperMagic}">
+                        <f:facet name="header" >
+                            <p:outputPanel style="text-align: right !important;" >
+                                <h:outputText value="Buscar todo: " />
+                                <p:inputText id="globalFilter" onkeyup="PF('pag_tb_scra').filter()" style="width:190px" placeholder="Palabra Clave"/>
+                            </p:outputPanel>
+                        </f:facet>
+                        <p:column  filterBy="#{pagina.nomTienda}" headerText="Nombre Tienda"  filterMatchMode="contains">
+                            #{pagina.nomTienda}
+                        </p:column>
+
+                        <p:column  filterBy="#{pagina.dominio}" headerText="Dominio"  filterMatchMode="contains" priority="2">
+                            #{pagina.dominio}"
+                        </p:column>
+                        <p:column filterBy="#{pagina.tagDiv}" headerText="Clase Contenedor"  filterMatchMode="contains" priority="3">
+                            #{pagina.tagDiv}"
+                        </p:column>
+                        <p:column filterBy="#{pagina.boolHttps}" headerText="HTTPS" filterMatchMode="equals" priority="4">
+                            <f:facet name="filter">
+                                <p:selectOneButton onchange="PF('pag_tb_scra').filter()">
+                                    <f:converter converterId="javax.faces.Boolean" />
+                                    <f:selectItem itemLabel="Todos" itemValue="" />
+                                    <f:selectItem itemLabel="Si" itemValue="true" />
+                                    <f:selectItem itemLabel="No" itemValue="false" />
+                                </p:selectOneButton>
+                            </f:facet>
+                            #{pagina.boolHttps ? 'Si': 'No'}
+                        </p:column>
+                        <f:facet name="footer">
+                            Hay en total #{paginaRegistradasBean.paginas.size()} paginas registradas.
+                        </f:facet>
+                    </p:dataTable>
+                    <p:dialog id="modificarPage_id" responsive="true" widgetVar="modificarPage" resizable="false" closeOnEscape="false" modal="true" width="1024" >
+                        <p:fieldset legend="Registro de paginas (Tiendas Magicas)" >
+                            <p:panel id="grid_scraped_pages">
+                                <p:panelGrid columns="3" layout="grid" columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-4" styleClass="ui-panelgrid-blank" >
+                                    <h:panelGroup>
+                                        <div><p:outputLabel value="Nombre" for="nom"/></div>
+                                        <p:inputText id="nom" required="true" value="#{paginaRegistradasBean.selecPagina.nomTienda}" placeholder="eg. Tucupita Magic Shop"  />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <div><p:outputLabel value="Dominio" for="dom"/></div>
+                                        <p:inputText id="dom" required="true" value="#{paginaRegistradasBean.selecPagina.dominio}" placeholder="eg. www.tiendamagica.com" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <div><p:outputLabel value="Metodo de Busqueda" for="mt_q"/></div>
+                                        <p:inputText id="mt_q"  placeholder="eg. search.php?q=" value="#{paginaRegistradasBean.selecPagina.mtdQ}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <div><p:outputLabel value="Clase CSS de Contenedor "  for="t_div"/></div>
+                                        <p:inputText id="t_div" required="true"  placeholder="eg. search_result" value="#{paginaRegistradasBean.selecPagina.tagDiv}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <div><p:outputLabel value="Etiqueta de Thumb"  for="t_thum"/></div>
+                                        <p:inputText id="t_thum" required="true"    placeholder="eg. img" value="#{paginaRegistradasBean.selecPagina.tagThumb}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <div><p:outputLabel value="Etiqueta de Titulo"  for="t_title"/></div>
+                                        <p:inputText id="t_title" required="true" placeholder="eg. .search_tittle ó a > h3" value="#{paginaRegistradasBean.selecPagina.tagTitle}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <div><p:outputLabel value="Clase CSS de Precio"  for="t_price"/></div>
+                                        <p:inputText id="t_price" required="true"   placeholder="eg. search_price" value="#{paginaRegistradasBean.selecPagina.tagPrice}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <div><p:outputLabel value="Argumento adicional"  for="arg_adi"/></div>
+                                        <p:inputText id="arg_adi"  placeholder="eg. &amp;limit=all" value="#{paginaRegistradasBean.selecPagina.argAdi}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <div><p:outputLabel value="Validaciones"  /></div>
+                                        <div style="padding-top: 0.7em;">
+                                            <h:outputText value=" Https: "  />
+                                            <p:selectBooleanCheckbox id="is_hhtps" value="#{paginaRegistradasBean.selecPagina.boolHttps}" />
+                                            <h:outputText value=" AjaxRquest: "   />
+                                            <p:selectBooleanCheckbox id="is_id"  value="#{paginaRegistradasBean.selecPagina.boolId}" />
+                                            <h:outputText value=" Method Post: "  />
+                                            <p:selectBooleanCheckbox id="is_post" value="#{paginaRegistradasBean.selecPagina.boolPost}" />
+                                        </div>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </p:panel> 
+                        </p:fieldset>
+                        <p:separator />
+                        <p:commandButton value="Aceptar" action="#{paginaRegistradasBean.modificarPage()}" process="@this,pag_reg_scraping" oncomplete="PF('modificarPage').hide();" update="modificarPage_id,:form_paginas:pag_reg_scraping" />
+                        <p:commandButton value="Cancelar" onclick="PF('modificarPage').hide();" type="button" />
+                        <!--
+                                                
+                        -->
+                    </p:dialog>
+                    <p:confirmDialog widgetVar="removeMe" id="RemoveME" responsive="true" closable="false" header="Confirmacion de eliminacion!" message="Por favor, asegurate que vas a eliminar esta pagina!">
+                        <p:commandButton  value="Si, Seguro!" oncomplete="PF('removeMe').hide(); " update=":form_paginas:pag_reg_scraping" process="@this,pag_reg_scraping" action="#{paginaRegistradasBean.eliminarPage(event)}" />
+                        <p:commandButton value="No, Aun!" onclick="PF('removeMe').hide()" type="button" />                                                
+                    </p:confirmDialog>
+                </h:form>
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

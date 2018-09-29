@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../tmplt/dentro.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="contenido">
+        <h:form id="reg_scr_pag_form" >
+            <f:metadata>
+                <f:viewAction action="#{resultadoGridDataBean.removveMe()}"  />
+            </f:metadata>
+            <p:panel style="border: 0;padding: 0 !important;margin-top: -1em;" id="reg_scr_pag_panel">
+               
+                <div style="text-align: right;">
+                    <div class="fondo-custom" style="text-align: center;width: 100%;padding:  1em 0 2em 0;border-bottom-left-radius:  1em;border-bottom-right-radius:  1em;" >
+                        <p:inputText id="item_search" style="width: 50%; height: 3em;border-radius: 0;" title="Comienza La Busqueda" value="#{resultadoGridDataBean.item_search}"  />
+                        <p:watermark value="e.g 52 Shades of Red (Gimmicks included) Version 2 by Shin Lim" for="item_search" />
+                        <p:commandButton  id="action-search" style="height: 3em;border-radius: 0;" icon="fa fa-search" action="#{resultadoGridDataBean.corriendoHilos()}" process="reg_scr_pag_panel" 
+                                          async="true" global="false" onclick="PF('panelLoading').show();PF('pbClient').start();PrimeFaces.widgets.widget_reg_scr_pag_form_action_search.disable()"  />
+                        
+                    </div>
+                </div>
+                <p:dialog onShow="PF('pbClient').setValue(1);PF('bui').show()" showHeader="false" showEffect="fade" hideEffect="fold" visible="false" widgetVar="panelLoading" closable="false" draggable="false" resizable="false" responsive="true" appendTo="@(body)" style="z-index: 10120 !important;" onHide="PF('bui').hide();" >
+                    <p:graphicImage library="img" name="preloader.gif" height="60" />
+                    <h:outputText style=" position: absolute;top: 0;bottom: 0;left: 0; right: 0; width: 50%; height: 30%;margin: auto;text-align: center" value="Buscando..."/>
+                    <p:progressBar ajax="true" id="progressBarClient" value="#{resultadoGridDataBean.progreso}" widgetVar="pbClient" style="margin: 0 auto;width:300px" labelTemplate="{value}%" styleClass="animated" global="false" interval="800" />
+                </p:dialog>
+                <p:panel id="data-grid-search"  style="border: 0;margin-top: 1em;">
+                    <p:outputPanel style="border: 0" autoUpdate="true" >
+                        <p:panel style="border: 0" visible="#{resultadoGridDataBean.progreso > 0}">
+                            <p:panelGrid layout="grid" columns="2" >
+                                <p:outputLabel value="Se encontraron: #{resultadoGridDataBean.resultados.size()} resultados" style="font-weight: bold;font-size: 1.7em !important;float: left;"/>    
+                                <p:selectOneMenu id="order_list" effect="fold" value="#{seleccion}" style="float: right;">
+                                    <f:selectItem itemLabel="Ordenar por?" itemValue="" noSelectionOption="true" />
+                                    <f:selectItem itemValue="asc" itemLabel="Mayor precio"/>
+                                    <f:selectItem itemValue="desc" itemLabel="Menor precio"/>
+                                    <p:ajax listener="#{resultadoGridDataBean.ordenacionMayorMenor(seleccion)}" update="datagrid_reasults" global="false"  onstart="PF('bui').show()" oncomplete="PF('bui').hide();"/>
+                                </p:selectOneMenu>
+                            </p:panelGrid>
+                            <p:dataGrid id="datagrid_reasults" var="result" value="#{resultadoGridDataBean.resultados}" layout="grid" columns="1"  paginatorAlwaysVisible="false" 
+                                        emptyMessage="Disculpanos, no encontramos resultados! Estaremos trabajando para mejorar!">
+                                <p:column style="text-align: center;">
+                                    <p:panelGrid columns="3" layout="grid" columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-4" >
+                                        <p:graphicImage value="#{result.imagen_link}" width="100" height="100" />
+                                        <h:panelGroup style="text-align: left;">
+                                            <div><h:outputText style="padding-top: 0.5em;padding-bottom:  0.5em;font-size: 1.5em; font-weight: bold" value="#{result.nomTienda}"/></div> 
+                                            <div style="padding-top: 1.5em;padding-bottom:  1em;"><h:outputText value="#{result.titulo}"/></div> 
+                                        </h:panelGroup>
+                                        <h:outputText value="#{result.precio_txt}" style="font-size: 2em;font-weight: bold;" />
+                                    </p:panelGrid>
+                                </p:column>
+                            </p:dataGrid>
+                        </p:panel>
+                    </p:outputPanel>
+                    <p:outputLabel value="Sin resultados, Lo sentimos!" rendered="#{resultadoGridDataBean.sinResultado}" />
+                </p:panel>
+                <p:blockUI block="data-grid-search" widgetVar="bui" trigger="action-search"  />
+            </p:panel>
+        </h:form> 
+    </ui:define>
+
+</ui:composition>
